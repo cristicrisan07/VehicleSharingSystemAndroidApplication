@@ -4,17 +4,13 @@ import android.content.Context
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-class MySingleton {
-
-
-
-    class MySingleton constructor(context: Context) {
+ class SingletonRQ constructor(context: Context) {
         companion object {
             @Volatile
-            private var INSTANCE: MySingleton? = null
+            private var INSTANCE: SingletonRQ? = null
             fun getInstance(context: Context) =
                     INSTANCE ?: synchronized(this) {
-                        INSTANCE ?: MySingleton(context).also {
+                        INSTANCE ?: SingletonRQ(context).also {
                             INSTANCE = it
                         }
                     }
@@ -32,4 +28,3 @@ class MySingleton {
 
     }
 
-}

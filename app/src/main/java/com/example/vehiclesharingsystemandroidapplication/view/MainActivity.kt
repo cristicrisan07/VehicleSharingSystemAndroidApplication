@@ -12,7 +12,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val buttonSearch=findViewById<Button>(R.id.mapsButton)
-
         buttonSearch.setOnClickListener {
             val intent = Intent(this,MapsActivity::class.java)
             startActivity(intent)
