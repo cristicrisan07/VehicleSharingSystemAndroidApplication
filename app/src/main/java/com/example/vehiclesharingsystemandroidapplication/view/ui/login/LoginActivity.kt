@@ -16,7 +16,10 @@ import android.widget.Toast
 import com.example.vehiclesharingsystemandroidapplication.databinding.ActivityLoginBinding
 
 import com.example.vehiclesharingsystemandroidapplication.R
+import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.view.MapsActivity
+import com.example.vehiclesharingsystemandroidapplication.view.RegisterActivity
+import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
 
 class LoginActivity : AppCompatActivity() {
 
@@ -28,6 +31,8 @@ class LoginActivity : AppCompatActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val session = Session(this)
 
         val username = binding.username
         val password = binding.password
@@ -58,13 +63,20 @@ class LoginActivity : AppCompatActivity() {
                 showLoginFailed(loginResult.error)
             }
             if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
+                if(loginResult.success is LoggedInUser) {
+                    setSessionWithUser(session,username.text.toString(), loginResult.success.token)
+                    updateUiWithUser(loginResult.success)
+                }else{
+                    if(loginResult.success is String){
+                        showUsernameTaken(loginResult.success)
+                    }
+                }
             }
 
-            //setResult(Activity.RESULT_OK)
+            setResult(Activity.RESULT_OK)
 
             //Complete and destroy login activity once successful
-            //finish()
+            finish()
         })
 
         username.afterTextChanged {
@@ -99,15 +111,14 @@ class LoginActivity : AppCompatActivity() {
             }
 
             register!!.setOnClickListener {
-                val intent = Intent(this@LoginActivity, MapsActivity::class.java)
-                startActivity(intent)
+                loginViewModel.checkUsername(username.text.toString(), password.text.toString())
             }
         }
     }
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
+    private fun updateUiWithUser(model: LoggedInUser) {
         val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
+        val displayName = model.username
         // TODO : initiate successful logged in experience
         Toast.makeText(
             applicationContext,
@@ -115,14 +126,22 @@ class LoginActivity : AppCompatActivity() {
             Toast.LENGTH_LONG
         ).show()
 
-//        val intent = Intent(this, MapsActivity::class.java)
-//        startActivity(intent)
+        val intent = Intent(this, MapsActivity::class.java)
+        startActivity(intent)
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
+    private fun showUsernameTaken( str: String) {
+        Toast.makeText(applicationContext, str, Toast.LENGTH_SHORT).show()
+    }
 }
+
+    private fun setSessionWithUser(session: Session, username: String, token: String){
+        session.setUsername(username)
+        session.setToken(token)
+    }
 
 /**
  * Extension function to simplify setting an afterTextChanged action to EditText components.

@@ -1,8 +1,7 @@
 package com.example.vehiclesharingsystemandroidapplication.view.data
 
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
-import com.example.vehiclesharingsystemandroidapplication.view.ui.login.LoginViewModel
-import com.example.vehiclesharingsystemandroidapplication.view.ui.login.VolleyListener
+import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -30,8 +29,11 @@ class LoginRepository(val dataSource: LoginDataSource) {
     }
 
     fun login(username: String, password: String, volleyListener: VolleyListener) {
-        // handle login
         dataSource.login(username, password,volleyListener)
+    }
+
+    fun checkUsername(username: String, password: String, volleyListener: VolleyListener) {
+        dataSource.checkUsername(username,password,volleyListener);
     }
 
     private fun setLoggedInUser(loggedInUser: LoggedInUser) {

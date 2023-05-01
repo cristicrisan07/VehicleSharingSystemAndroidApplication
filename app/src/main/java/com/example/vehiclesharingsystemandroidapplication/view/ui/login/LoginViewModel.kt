@@ -8,9 +8,12 @@ import com.example.vehiclesharingsystemandroidapplication.view.data.LoginReposit
 import com.example.vehiclesharingsystemandroidapplication.view.data.Result
 
 import com.example.vehiclesharingsystemandroidapplication.R
+import com.example.vehiclesharingsystemandroidapplication.service.Validator
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
+import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
+import kotlin.reflect.typeOf
 
-class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel(),VolleyListener {
+class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel(), VolleyListener {
 
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
@@ -23,36 +26,37 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         loginRepository.login(username, password,this as VolleyListener)
     }
 
+    fun checkUsername(username: String, password: String) {
+        loginRepository.checkUsername(username, password,this as VolleyListener)
+    }
+
     fun loginDataChanged(username: String, password: String) {
-        if (!isUserNameValid(username)) {
+        if (!Validator.isUserNameValid(username)) {
             _loginForm.value = LoginFormState(usernameError = R.string.invalid_username)
-        } else if (!isPasswordValid(password)) {
+        } else if (!Validator.isPasswordValid(password)) {
             _loginForm.value = LoginFormState(passwordError = R.string.invalid_password)
         } else {
             _loginForm.value = LoginFormState(isDataValid = true)
         }
     }
 
-    // A placeholder username validation check
-    private fun isUserNameValid(username: String): Boolean {
-        return if (username.contains('@')) {
-            Patterns.EMAIL_ADDRESS.matcher(username).matches()
-        } else {
-            username.isNotBlank()
-        }
-    }
-
-    // A placeholder password validation check
-    private fun isPasswordValid(password: String): Boolean {
-        return password.length > 5
-    }
-
-    override fun requestFinished(result: Result<LoggedInUser>) {
+    override fun requestFinished(result: Result<Any>) {
         if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
+            if(result.data is LoggedInUser) {
+                val resultData = result.data
+                _loginResult.value =
+                    LoginResult(success = resultData)
+            }
+            else{
+                if(result.data is String) {
+                    val resultData = result.data
+                    _loginResult.value =
+                        LoginResult(success = resultData)
+                }
+            }
         } else {
             _loginResult.value = LoginResult(error = R.string.login_failed)
         }
     }
+
 }

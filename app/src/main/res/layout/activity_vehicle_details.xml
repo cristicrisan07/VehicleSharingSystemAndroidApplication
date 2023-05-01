@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clid"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".view.VehicleDetailsActivity">
+
+    <TextView
+        android:id="@+id/manufacturerModelAndYearlTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/seatsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="32dp"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@+id/seatsLabel"
+        app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
+
+    <TextView
+        android:id="@+id/maximumMassLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/maximum_authorised_mass_label"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@id/seatsTextView"
+        app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
+
+    <TextView
+        android:id="@+id/seatsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/nb_seats_label"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
+
+    <TextView
+        android:id="@+id/maximumMassTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@+id/maximumMassLabel"
+        app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
+
+    <TextView
+        android:id="@+id/hpLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/horse_power_label"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/seatsLabel" />
+
+    <TextView
+        android:id="@+id/hpTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@+id/hpLabel"
+        app:layout_constraintTop_toTopOf="@+id/maximumMassLabel" />
+
+    <TextView
+        android:id="@+id/torqueLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/torque_label"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@id/hpTextView"
+        app:layout_constraintTop_toTopOf="@+id/maximumMassLabel" />
+
+    <TextView
+        android:id="@+id/torqueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@+id/torqueLabel"
+        app:layout_constraintTop_toTopOf="@+id/maximumMassLabel" />
+
+    <TextView
+        android:id="@+id/rangeLeftLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/range_left_label"
+        android:textColor="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/hpLabel" />
+
+    <TextView
+        android:id="@+id/rangeLeftTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@+id/rangeLeftLabel"
+        app:layout_constraintTop_toTopOf="@+id/torqueLabel" />
+
+    <TextView
+        android:id="@+id/priceLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/price_label"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@+id/rangeLeftTextView"
+        app:layout_constraintTop_toTopOf="@+id/torqueTextView" />
+
+    <TextView
+        android:id="@+id/priceTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:textColor="#000000"
+        app:layout_constraintStart_toEndOf="@+id/priceLabel"
+        app:layout_constraintTop_toTopOf="@+id/torqueTextView" />
+
+    <Button
+        android:id="@+id/startRentalSessionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/start_rental_session_button"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/priceLabel" />
+</androidx.constraintlayout.widget.ConstraintLayout>
