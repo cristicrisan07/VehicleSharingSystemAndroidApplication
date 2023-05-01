@@ -1,5 +1,6 @@
 package com.example.vehiclesharingsystemandroidapplication.view
 
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -44,6 +45,12 @@ class VehicleDetailsActivity : AppCompatActivity() {
             torque.text = vehicle.torque
             rangeLeft.text = vehicle.rangeLeftInKm
             price.text = vehicle.price.toString()
+        }
+
+        startRentalButton.setOnClickListener {
+            val intent = Intent(this, RentalSessionActivity::class.java)
+            intent.putExtra("vehicle",vehicle)
+            startActivity(intent)
         }
 
 
