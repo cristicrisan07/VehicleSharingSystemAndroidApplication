@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.vehiclesharingsystemandroidapplication.R
 import com.example.vehiclesharingsystemandroidapplication.model.ApplicationAccount
 import com.example.vehiclesharingsystemandroidapplication.model.Driver
+import com.example.vehiclesharingsystemandroidapplication.service.DriverService
 import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
 import com.example.vehiclesharingsystemandroidapplication.view.ui.login.LoggedInUserView
@@ -75,7 +76,8 @@ class RegisterActivity : AppCompatActivity() {
             }
             if(registerResult.success != null){
                 if(registerResult.success is LoggedInUser) {
-                    setSessionWithUser(session,username, registerResult.success.token)
+                    DriverService.setSessionWithUsernameAndToken(session,username, registerResult.success.token)
+                    DriverService.setDriverSubscriptionFromServer(session,this@RegisterActivity)
                     updateUiWithUser(registerResult.success)
                 }
             }
@@ -110,9 +112,5 @@ class RegisterActivity : AppCompatActivity() {
         ).show()
         val intent = Intent(this, MapsActivity::class.java)
         startActivity(intent)
-    }
-    private fun setSessionWithUser(session: Session,username: String, token: String){
-        session.setUsername(username)
-        session.setToken(token)
     }
 }

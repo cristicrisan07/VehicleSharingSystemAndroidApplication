@@ -17,6 +17,8 @@ import com.example.vehiclesharingsystemandroidapplication.model.Vehicle
 import com.example.vehiclesharingsystemandroidapplication.service.DtoConverter
 import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.service.SingletonRQ
+import com.example.vehiclesharingsystemandroidapplication.view.data.Result
+import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
@@ -30,7 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.runBlocking
 
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRequestPermissionsResultCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRequestPermissionsResultCallback{
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding

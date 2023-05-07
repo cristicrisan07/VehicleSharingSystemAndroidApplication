@@ -47,7 +47,8 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
                         subscriptionsArrayList?.get(value)?.rentalSubscription?.let { rentalSubscription ->
                             data.getStringExtra("encryptedCardNumber")?.let { it ->
                                 addSubscriptionToDriver(username!!,
-                                    rentalSubscription.id, it,token!!
+                                    rentalSubscription.id, it,token!!,
+                                    rentalSubscription.rentalPrice.value.toString()
                                 )
                             }
                         }
@@ -65,7 +66,6 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
             resultLauncher.launch(intent)
         }
         getAvailableSubscriptions(token!!)
-
 
     }
 
@@ -120,7 +120,7 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
         SingletonRQ.getInstance(this@SubscriptionSelectionActivity).addToRequestQueue(stringRequest)
     }
 
-    private fun addSubscriptionToDriver(username:String, subscriptionId: String, encryptedCardNumber: String, token: String){
+    private fun addSubscriptionToDriver(username:String, subscriptionId: String, encryptedCardNumber: String, paymentValue: String, token: String){
         val stringRequest: StringRequest = object : StringRequest(
             Method.POST,
             this.getString(R.string.addSubscriptionToDriver),
@@ -149,6 +149,7 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
                 subscriptionContractDTO.put("driverUsername",username)
                 subscriptionContractDTO.put("subscriptionId",subscriptionId)
                 subscriptionContractDTO.put("encryptedCardNumber",encryptedCardNumber)
+                subscriptionContractDTO.put("value",paymentValue)
                 return subscriptionContractDTO.toString().toByteArray(Charset.forName("utf-8"))
 
             }

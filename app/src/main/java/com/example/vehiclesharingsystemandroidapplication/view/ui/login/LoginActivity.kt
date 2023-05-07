@@ -16,6 +16,7 @@ import android.widget.Toast
 import com.example.vehiclesharingsystemandroidapplication.databinding.ActivityLoginBinding
 
 import com.example.vehiclesharingsystemandroidapplication.R
+import com.example.vehiclesharingsystemandroidapplication.service.DriverService
 import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.view.MapsActivity
 import com.example.vehiclesharingsystemandroidapplication.view.RegisterActivity
@@ -64,7 +65,8 @@ class LoginActivity : AppCompatActivity() {
             }
             if (loginResult.success != null) {
                 if(loginResult.success is LoggedInUser) {
-                    setSessionWithUser(session,username.text.toString(), loginResult.success.token)
+                    DriverService.setSessionWithUsernameAndToken(session,username.text.toString(), loginResult.success.token)
+                    DriverService.setDriverSubscriptionFromServer(session,this@LoginActivity)
                     updateUiWithUser(loginResult.success)
                 }else{
                     if(loginResult.success is String){
@@ -137,11 +139,6 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(applicationContext, str, Toast.LENGTH_SHORT).show()
     }
 }
-
-    private fun setSessionWithUser(session: Session, username: String, token: String){
-        session.setUsername(username)
-        session.setToken(token)
-    }
 
 /**
  * Extension function to simplify setting an afterTextChanged action to EditText components.

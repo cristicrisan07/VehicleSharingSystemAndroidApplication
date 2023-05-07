@@ -20,9 +20,12 @@
     <string name="loginPath">http://10.0.2.2:8080/vsss/driver/authenticate</string>
     <string name="registerPath">http://10.0.2.2:8080/vsss/driver/register</string>
     <string name="checkUsernamePath">http://10.0.2.2:8080/vsss/driver/checkUsername</string>
-    <string name="getAllVehicles">http://10.0.2.2:8080/vsss/driver/getAllVehicles</string>
+    <string name="getAllVehicles">http://10.0.2.2:8080/vsss/driver/getAllAvailableVehicles</string>
     <string name="getAllSubscriptions">http://10.0.2.2:8080/vsss/administrator/getAvailableSubscriptions</string>
     <string name="addSubscriptionToDriver">http://10.0.2.2:8080/vsss/driver/addSubscriptionToDriver</string>
+    <string name="getDriverSubscription">http://10.0.2.2:8080/vsss/driver/getDriverSubscription/</string>
+    <string name="endRentalSession">http://10.0.2.2:8080/vsss/driver/endRentalSession</string>
+    <string name="startRentalSession">http://10.0.2.2:8080/vsss/driver/startRentalSession</string>
     <string name="registerButtonInActivity">Register</string>
     <string name="more_info_needed_badge_register_activity">MORE INFO NEEDED</string>
     <string name="range_left_label">Range left:</string>
@@ -57,5 +60,6 @@
     <string name="card_cvv_label">CVV:</string>
     <string name="payment_activity_pay_button_text">Pay</string>
     <string name="slash">/</string>
+    <string name="continue_to_map">CONTINUE TO MAP</string>
 </resources>
 

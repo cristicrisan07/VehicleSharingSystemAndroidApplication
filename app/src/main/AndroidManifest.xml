@@ -19,6 +19,14 @@
         android:theme="@style/Theme.VehicleSharingSystemAndroidApplication"
         tools:targetApi="tiramisu">
         <activity
+            android:name=".view.AfterRentalSessionCompletionActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Holo.Dialog">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".view.PaymentActivity"
             android:exported="false">
             <meta-data
@@ -92,6 +100,7 @@
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 

@@ -25,4 +25,12 @@ class Session(context: Context?){
     fun getToken(): String? {
         return prefs!!.getString("token", "")
     }
+
+    fun setActiveSubscription(jsonStringActiveSubscription: String?){
+        prefs!!.edit().putString("activeSubscription",jsonStringActiveSubscription).apply()
+    }
+
+    fun getActiveSubscription():String?{
+        return prefs!!.getString("activeSubscription","")
+    }
 }
