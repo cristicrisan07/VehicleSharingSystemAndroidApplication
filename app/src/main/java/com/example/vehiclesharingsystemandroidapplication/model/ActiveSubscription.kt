@@ -4,5 +4,6 @@ import java.sql.Timestamp
 
 data class ActiveSubscription (
     var subscription: RentalSubscription,
-    var startData: Timestamp
+    var startDate: Timestamp,
+    var endDate:Timestamp
     )

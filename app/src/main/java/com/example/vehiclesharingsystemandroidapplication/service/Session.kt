@@ -19,10 +19,10 @@ class Session(context: Context?){
     }
 
     fun setToken(token: String?) {
-        prefs!!.edit().putString("username", token).apply()
+        prefs!!.edit().putString("token", token).apply()
     }
 
     fun getToken(): String? {
-        return prefs!!.getString("username", "")
+        return prefs!!.getString("token", "")
     }
 }

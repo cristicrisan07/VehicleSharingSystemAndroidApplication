@@ -1,6 +1,7 @@
 package com.example.vehiclesharingsystemandroidapplication.service
 
 import com.example.vehiclesharingsystemandroidapplication.model.RentalPrice
+import com.example.vehiclesharingsystemandroidapplication.model.RentalSubscription
 import com.example.vehiclesharingsystemandroidapplication.model.Vehicle
 import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
@@ -33,5 +34,12 @@ class DtoConverter {
             fromStringToLatLng(vehicleDTO.getString("location")),
             fromDTOtoRentalPrice(vehicleDTO.getJSONObject("rentalPriceDTO"))
         )
+    }
+
+    fun fromDTOtoSubscription(subscriptionDTO: JSONObject):RentalSubscription{
+        return RentalSubscription(subscriptionDTO.getString("id"),
+            subscriptionDTO.getString("name"),
+            subscriptionDTO.getString("kilometersLimit"),
+            fromDTOtoRentalPrice(subscriptionDTO.getJSONObject("rentalPriceDTO")))
     }
 }

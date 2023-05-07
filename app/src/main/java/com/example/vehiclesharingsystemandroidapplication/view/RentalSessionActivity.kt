@@ -27,5 +27,7 @@ class RentalSessionActivity : AppCompatActivity() {
             distanceTravelledTextView.text = "15km"
             amountToPayTextView.text = "180 RON"
         }
+
+
     }
 }
