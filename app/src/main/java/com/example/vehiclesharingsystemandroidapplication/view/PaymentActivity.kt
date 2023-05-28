@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.annotation.RequiresApi
 import com.android.volley.toolbox.StringRequest
 import com.example.vehiclesharingsystemandroidapplication.R
@@ -77,5 +78,13 @@ class PaymentActivity : AppCompatActivity() {
                 }
             }
         }
+        val callback = this.onBackPressedDispatcher.addCallback(this) {
+            moveTaskToBack(true)
+        }
+    }
+
+    @Deprecated("Deprecated in Java", ReplaceWith("moveTaskToBack(true)"))
+    override fun onBackPressed() {
+        moveTaskToBack(true)
     }
 }

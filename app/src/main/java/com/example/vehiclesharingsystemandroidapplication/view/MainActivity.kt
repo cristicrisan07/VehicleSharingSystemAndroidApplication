@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.view.ui.login.LoginActivity
 
@@ -17,8 +18,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
 
         }else{
-            val intent = Intent(this, MapsActivity::class.java)
-            startActivity(intent)
+            if(session.getDocumentSubmissionStatus()){
+                startActivity(Intent(this, MapsActivity::class.java))
+            }else{
+                startActivity(Intent(this,VerifyIdentityActivity::class.java))
+            }
         }
         setResult(Activity.RESULT_OK)
         //Complete and destroy login activity once successful

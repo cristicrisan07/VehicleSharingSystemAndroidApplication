@@ -47,8 +47,8 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
                         subscriptionsArrayList?.get(value)?.rentalSubscription?.let { rentalSubscription ->
                             data.getStringExtra("encryptedCardNumber")?.let { it ->
                                 addSubscriptionToDriver(username!!,
-                                    rentalSubscription.id, it,token!!,
-                                    rentalSubscription.rentalPrice.value.toString()
+                                    rentalSubscription.id, it,
+                                    rentalSubscription.rentalPrice.value.toString(),token!!
                                 )
                             }
                         }

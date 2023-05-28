@@ -10,6 +10,7 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.vehiclesharingsystemandroidapplication.R
 import com.example.vehiclesharingsystemandroidapplication.model.Vehicle
 import com.example.vehiclesharingsystemandroidapplication.service.DriverService
@@ -21,6 +22,7 @@ import kotlin.math.max
 
 class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
     private lateinit var vehicle: Vehicle
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vehicle_details)
@@ -29,6 +31,8 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
         window.attributes.gravity = Gravity.BOTTOM
         window.attributes.width = MATCH_PARENT
         this.setFinishOnTouchOutside(true)
+
+        val session = Session(this)
 
         vehicle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             this.intent.extras?.getParcelable("vehicle",Vehicle::class.java)!!
@@ -52,20 +56,44 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
         rangeLeft.text = vehicle.rangeLeftInKm
         price.text = vehicle.price.toString()
 
-        startRentalButton.setOnClickListener {
-            DriverService.startDriverRentalSession(Session(this),this,vehicle!!.vin,this as VolleyListener)
+        if(!session.getUsername().isNullOrEmpty()){
+            if(session.getDocumentsValidationStatus() == "VALID") {
+                if (session.getCurrentRentalSession().isNullOrEmpty()) {
+                    startRentalButton.setOnClickListener {
+                        DriverService.startDriverRentalSession(
+                            Session(this),
+                            this,
+                            vehicle,
+                            this as VolleyListener
+                        )
+                    }
+                } else{
+                    startRentalButton.isEnabled = false
+                    startRentalButton.text = getString(R.string.cannotRentAnotherVehicle)
+                }
+            }else{
+                startRentalButton.isEnabled = false
+                startRentalButton.text = getString(R.string.validation_in_progress)
+            }
+        }else{
+            startRentalButton.isEnabled = false
+            startRentalButton.text = getString(R.string.loginToStartRenting)
         }
+
+
     }
 
     override fun requestFinished(result: Result<Any>) {
         if (result is Result.Success) {
             val resultData = result.data as String
-            if(resultData == "SUCCESS"){
+            if(resultData.contains("SUCCESS")){
                 val intent = Intent(this, RentalSessionActivity::class.java)
-                intent.putExtra("vehicle",vehicle)
                 startActivity(intent)
-                setResult(Activity.RESULT_OK)
-                finish()
+
+                val resultIntent = Intent()
+                resultIntent.putExtra("status",this.getString(R.string.RENTAL_STARTED_OK))
+                setResult(Activity.RESULT_OK,resultIntent)
+                this.finish()
             }
             else{
                 Toast.makeText(this,resultData, Toast.LENGTH_LONG).show()

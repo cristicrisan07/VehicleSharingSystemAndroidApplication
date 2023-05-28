@@ -1,5 +1,6 @@
 package com.example.vehiclesharingsystemandroidapplication.view
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,15 +17,19 @@ import com.example.vehiclesharingsystemandroidapplication.model.ApplicationAccou
 import com.example.vehiclesharingsystemandroidapplication.model.Driver
 import com.example.vehiclesharingsystemandroidapplication.service.DriverService
 import com.example.vehiclesharingsystemandroidapplication.service.Session
+import com.example.vehiclesharingsystemandroidapplication.view.data.Result
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
+import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
 import com.example.vehiclesharingsystemandroidapplication.view.ui.login.LoggedInUserView
 import com.example.vehiclesharingsystemandroidapplication.view.ui.login.afterTextChanged
 import com.example.vehiclesharingsystemandroidapplication.view.ui.register.RegisterViewModel
 import com.example.vehiclesharingsystemandroidapplication.view.ui.register.RegisterViewModelFactory
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity(),VolleyListener {
 
     private lateinit var registerViewModel: RegisterViewModel
+    private lateinit var session:Session
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +44,7 @@ class RegisterActivity : AppCompatActivity() {
         val phoneNumber = findViewById<EditText>(R.id.phone_number_text)
         val email = findViewById<EditText>(R.id.email_text)
         val loading = findViewById<ProgressBar>(R.id.loading)
-        val session = Session(this)
+        session = Session(this)
 
         val registerButton = findViewById<Button>(R.id.registerButton)
 
@@ -77,10 +82,14 @@ class RegisterActivity : AppCompatActivity() {
             if(registerResult.success != null){
                 if(registerResult.success is LoggedInUser) {
                     DriverService.setSessionWithUsernameAndToken(session,username, registerResult.success.token)
-                    DriverService.setDriverSubscriptionFromServer(session,this@RegisterActivity)
+                    DriverService.getAndSetDriverSubscriptionFromServer(session,this@RegisterActivity)
                     updateUiWithUser(registerResult.success)
                 }
             }
+            setResult(Activity.RESULT_OK)
+
+            //Complete and destroy login activity once successful
+            finish()
         })
 
         firstName.afterTextChanged {
@@ -110,7 +119,34 @@ class RegisterActivity : AppCompatActivity() {
             "$welcome $displayName",
             Toast.LENGTH_LONG
         ).show()
-        val intent = Intent(this, MapsActivity::class.java)
-        startActivity(intent)
+        if(session.getDocumentSubmissionStatus()){
+            if(session.getDocumentsValidationStatus() != "VALID"){
+                DriverService.getDocumentValidationStatusFromServer(session,this)
+            }
+            startActivity(Intent(this,MapsActivity::class.java))
+        }else {
+            DriverService.getDocumentSubmissionStatusFromServer(session,this,this as VolleyListener)
+        }
     }
+
+    override fun requestFinished(result: Result<Any>) {
+        if (result is Result.Success) {
+            val resultData = result.data as String
+            if(resultData == "SUBMITTED"){
+                DriverService.getDocumentValidationStatusFromServer(session,this)
+                session.setDocumentSubmissionStatus(true)
+                startActivity(Intent(this,MapsActivity::class.java))
+
+            }else{
+                startActivity(Intent(this,VerifyIdentityActivity::class.java))
+                session.setDocumentSubmissionStatus(false)
+            }
+
+            finish()
+            setResult(RESULT_OK)
+        }else{
+            Toast.makeText(this,result.toString(), Toast.LENGTH_LONG).show()
+        }
+    }
+
 }

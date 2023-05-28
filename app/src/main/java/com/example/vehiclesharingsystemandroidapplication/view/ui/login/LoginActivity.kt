@@ -11,21 +11,28 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.example.vehiclesharingsystemandroidapplication.databinding.ActivityLoginBinding
 
 import com.example.vehiclesharingsystemandroidapplication.R
+import com.example.vehiclesharingsystemandroidapplication.model.Driver
+import com.example.vehiclesharingsystemandroidapplication.model.RentalSession
 import com.example.vehiclesharingsystemandroidapplication.service.DriverService
 import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.view.MapsActivity
 import com.example.vehiclesharingsystemandroidapplication.view.RegisterActivity
+import com.example.vehiclesharingsystemandroidapplication.view.VerifyIdentityActivity
+import com.example.vehiclesharingsystemandroidapplication.view.data.Result
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
+import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(),VolleyListener {
 
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var session: Session
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +40,12 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val session = Session(this)
-
         val username = binding.username
         val password = binding.password
         val login = binding.login
         val register = binding.register
         val loading = binding.loading
+        session = Session(this)
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory(this))[LoginViewModel::class.java]
 
@@ -66,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
             if (loginResult.success != null) {
                 if(loginResult.success is LoggedInUser) {
                     DriverService.setSessionWithUsernameAndToken(session,username.text.toString(), loginResult.success.token)
-                    DriverService.setDriverSubscriptionFromServer(session,this@LoginActivity)
+                    DriverService.getAndSetDriverSubscriptionFromServer(session,this@LoginActivity)
                     updateUiWithUser(loginResult.success)
                 }else{
                     if(loginResult.success is String){
@@ -116,6 +122,12 @@ class LoginActivity : AppCompatActivity() {
                 loginViewModel.checkUsername(username.text.toString(), password.text.toString())
             }
         }
+
+        val continueAsGuestButton = findViewById<Button>(R.id.guestButton)
+        continueAsGuestButton.setOnClickListener {
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun updateUiWithUser(model: LoggedInUser) {
@@ -127,9 +139,14 @@ class LoginActivity : AppCompatActivity() {
             "$welcome $displayName",
             Toast.LENGTH_LONG
         ).show()
-
-        val intent = Intent(this, MapsActivity::class.java)
-        startActivity(intent)
+        if(session.getDocumentSubmissionStatus()){
+            if(session.getDocumentsValidationStatus() != "VALID"){
+            DriverService.getDocumentValidationStatusFromServer(session,this)
+            }
+            startActivity(Intent(this,MapsActivity::class.java))
+        }else {
+            DriverService.getDocumentSubmissionStatusFromServer(session,this,this as VolleyListener)
+        }
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
@@ -138,7 +155,28 @@ class LoginActivity : AppCompatActivity() {
     private fun showUsernameTaken( str: String) {
         Toast.makeText(applicationContext, str, Toast.LENGTH_SHORT).show()
     }
+
+    override fun requestFinished(result: Result<Any>) {
+        if (result is Result.Success) {
+            val resultData = result.data as String
+            if(resultData == "SUBMITTED"){
+                DriverService.getDocumentValidationStatusFromServer(session,this)
+                session.setDocumentSubmissionStatus(true)
+                startActivity(Intent(this,MapsActivity::class.java))
+
+            }else{
+                startActivity(Intent(this,VerifyIdentityActivity::class.java))
+                session.setDocumentSubmissionStatus(false)
+            }
+
+            finish()
+            setResult(RESULT_OK)
+        }else{
+            Toast.makeText(this,result.toString(), Toast.LENGTH_LONG).show()
+        }
+    }
 }
+
 
 /**
  * Extension function to simplify setting an afterTextChanged action to EditText components.
