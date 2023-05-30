@@ -1,10 +1,14 @@
 package com.example.vehiclesharingsystemandroidapplication.view
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
@@ -33,39 +37,55 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
     private lateinit var takeFrontPhotoButton:Button
     private lateinit var takeBackPhotoButton:Button
     private lateinit var session:Session
+    private lateinit var imageUri:Uri
 
     private var resultLauncherBack: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val extras = result.data!!.extras
-        val imageBitmap =extras!!.get("data") as Bitmap
-        val res= WeakReference(
-            Bitmap.createScaledBitmap(
-                imageBitmap,
-                imageBitmap.width, imageBitmap.height, false
-            ).copy(Bitmap.Config.RGB_565, true)
-        )
-        res.get()?.let{ encodedPhotoBack = encodeImage(it)
+        var bitmap: Bitmap? = null
+        val contentResolver = contentResolver
+        try {
+            bitmap = if (Build.VERSION.SDK_INT < 28) {
+                MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+            } else {
+                val source: ImageDecoder.Source =
+                    ImageDecoder.createSource(contentResolver, imageUri)
+                ImageDecoder.decodeBitmap(source)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        encodedPhotoBack = bitmap?.let {
+                it -> encodeImage(it)
+        }
             takeBackPhotoButton.isEnabled = false
             takeBackPhotoButton.text = this.getString(R.string.take_photo_back_button_taken)
             if(encodedPhotoFront!=null){
                 submitButton.isEnabled = true
-            }}
+            }
     }
 
     private var resultLauncherFront: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val extras = result.data!!.extras
-        val imageBitmap =extras!!.get("data") as Bitmap
-        val res= WeakReference(
-            Bitmap.createScaledBitmap(
-                imageBitmap,
-                imageBitmap.width, imageBitmap.height, false
-            ).copy(Bitmap.Config.RGB_565, true)
-        )
-        res.get()?.let{ encodedPhotoFront = encodeImage(it)
+            var bitmap: Bitmap? = null
+            val contentResolver = contentResolver
+            try {
+                bitmap = if (Build.VERSION.SDK_INT < 28) {
+                    MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+                } else {
+                    val source: ImageDecoder.Source =
+                        ImageDecoder.createSource(contentResolver, imageUri)
+                    ImageDecoder.decodeBitmap(source)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            encodedPhotoFront = bitmap?.let {
+                    it -> encodeImage(it)
+            }
             takeFrontPhotoButton.isEnabled = false
             takeFrontPhotoButton.text = this.getString(R.string.take_photo_front_button_taken)
         if(encodedPhotoBack!=null){
             submitButton.isEnabled = true
-        }}
+        }
+
     }
 
 
@@ -107,11 +127,16 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
 
             if (ActivityCompat.checkSelfPermission(this@VerifyIdentityActivity,
                     Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED ) {
+
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 if (intent.resolveActivity(packageManager) != null){
                     if(side == "front"){
-                    resultLauncherFront?.launch(intent)
+                        imageUri = createImageFile("front")
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                        resultLauncherFront?.launch(intent)
                     }else{
+                        imageUri = createImageFile("back")
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
                         resultLauncherBack?.launch(intent)
                     }
                 }
@@ -144,16 +169,12 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
         return
     }
 
-//    private fun saveImage(image: Bitmap): Uri {
-//        val imagePath = File(this.cacheDir, "images")
-//        imagePath.mkdirs()
-//        val newFile = File(imagePath, "default_image.jpg")
-//        val stream = FileOutputStream(newFile)
-//        image.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-//        stream.flush()
-//        stream.close()
-//        return getUriForFile(this, "com.mydomain.fileprovider", newFile)
-//    }
+    private fun createImageFile(name: String): Uri {
+        val imagePath = File(this.cacheDir, "images")
+        imagePath.mkdirs()
+        val newFile = File(imagePath, "$name.jpg")
+        return getUriForFile(this, "com.mydomain.fileprovider", newFile)
+    }
 
     private fun encodeImage(bm: Bitmap): String? {
         val barr = ByteArrayOutputStream()
