@@ -192,13 +192,14 @@ class DriverService {
                 context.getString(R.string.addDrivingLicenseToDriver),
                 { response->
                     volleyListener.requestFinished(Result.Success(response))
+
                 },
                 {error->
                     volleyListener.requestFinished(Result.Error(Exception(error)))
                 }){
                 override fun getBody(): ByteArray {
                     val identityValidationDocumentDTO = JSONObject()
-                    identityValidationDocumentDTO.put("username","driver")
+                    identityValidationDocumentDTO.put("username",session.getUsername())
                     identityValidationDocumentDTO.put("photoFront",photoFront)
                     identityValidationDocumentDTO.put("photoBack",photoBack)
                     return identityValidationDocumentDTO.toString().toByteArray(Charset.forName("utf-8"))
@@ -221,7 +222,10 @@ class DriverService {
                 Method.POST,
                 context.getString(R.string.getDocumentSubmissionStatus),
                 { response->
-                    volleyListener.requestFinished(Result.Success(response))
+                    val enhancedResponse = JSONObject()
+                    enhancedResponse.put("response",response)
+                    enhancedResponse.put("source","document_submission_status")
+                    volleyListener.requestFinished(Result.Success(enhancedResponse.toString()))
                 },
                 {error->
                     volleyListener.requestFinished(Result.Error(Exception(error)))
@@ -240,13 +244,17 @@ class DriverService {
             }
             SingletonRQ.getInstance(context).addToRequestQueue(stringRequest)
         }
-        fun getDocumentValidationStatusFromServer(session: Session, context: Context){
+        fun getDocumentValidationStatusFromServer(session: Session, context: Context,volleyListener: VolleyListener){
             val token = session.getToken()
             val stringRequest: StringRequest = object: StringRequest(
                 Method.POST,
                 context.getString(R.string.getDocumentValidationStatus),
                 { response->
                     session.setDocumentsValidationStatus(response)
+                    val enhancedResponse = JSONObject()
+                    enhancedResponse.put("response",response)
+                    enhancedResponse.put("source","document_validation_status")
+                    volleyListener.requestFinished(Result.Success(enhancedResponse.toString()))
                 },
                 {error->
                     Toast.makeText(context,error.toString(), Toast.LENGTH_LONG).show()

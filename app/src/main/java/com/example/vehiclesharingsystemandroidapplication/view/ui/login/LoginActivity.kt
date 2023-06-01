@@ -27,6 +27,7 @@ import com.example.vehiclesharingsystemandroidapplication.view.VerifyIdentityAct
 import com.example.vehiclesharingsystemandroidapplication.view.data.Result
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
 import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
+import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity(),VolleyListener {
 
@@ -80,11 +81,6 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
                     }
                 }
             }
-
-            setResult(Activity.RESULT_OK)
-
-            //Complete and destroy login activity once successful
-            finish()
         })
 
         username.afterTextChanged {
@@ -141,9 +137,8 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
         ).show()
         if(session.getDocumentSubmissionStatus()){
             if(session.getDocumentsValidationStatus() != "VALID"){
-            DriverService.getDocumentValidationStatusFromServer(session,this)
+            DriverService.getDocumentValidationStatusFromServer(session,this,this as VolleyListener)
             }
-            startActivity(Intent(this,MapsActivity::class.java))
         }else {
             DriverService.getDocumentSubmissionStatusFromServer(session,this,this as VolleyListener)
         }
@@ -159,20 +154,32 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
     override fun requestFinished(result: Result<Any>) {
         if (result is Result.Success) {
             val resultData = result.data as String
-            if(resultData == "SUBMITTED"){
-                DriverService.getDocumentValidationStatusFromServer(session,this)
-                session.setDocumentSubmissionStatus(true)
-                startActivity(Intent(this,MapsActivity::class.java))
+            val resultJSONObject = JSONObject(resultData)
+            val response = resultJSONObject.getString("response")
+            if (resultJSONObject.getString("source") == "document_submission_status") {
+                if (response == "SUBMITTED") {
+                    DriverService.getDocumentValidationStatusFromServer(
+                        session,
+                        this,
+                        this as VolleyListener
+                    )
+                    session.setDocumentSubmissionStatus(true)
 
-            }else{
-                startActivity(Intent(this,VerifyIdentityActivity::class.java))
-                session.setDocumentSubmissionStatus(false)
+                } else {
+                    startActivity(Intent(this, VerifyIdentityActivity::class.java))
+                    session.setDocumentSubmissionStatus(false)
+                }
+            } else {
+                if(response == "INVALID"){
+                    startActivity(Intent(this, VerifyIdentityActivity::class.java))
+                }else{
+                    startActivity(Intent(this, MapsActivity::class.java))
+                }
+                finish()
+                setResult(RESULT_OK)
             }
-
-            finish()
-            setResult(RESULT_OK)
-        }else{
-            Toast.makeText(this,result.toString(), Toast.LENGTH_LONG).show()
+        }else {
+            Toast.makeText(this, result.toString(), Toast.LENGTH_LONG).show()
         }
     }
 }

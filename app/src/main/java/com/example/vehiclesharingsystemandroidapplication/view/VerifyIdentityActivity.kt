@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -116,7 +117,12 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
                     Toast.makeText(this, "Please take a photo of both sides before submitting", Toast.LENGTH_SHORT).show()
                 }
            }
-    }
+        if(session.getDocumentsValidationStatus() == "INVALID") {
+            findViewById<TextView>(R.id.identityValidationNeededTextView).text = "Previously submitted pictures are not valid." + this.getString(R.string.identity_verification_needed)
+
+        }
+
+        }
 
     companion object {
         private const val CAMERA_PERMISSION_REQUEST_CODE = 2
@@ -185,6 +191,7 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
     override fun requestFinished(result: Result<Any>) {
         if (result is Result.Success) {
             session.setDocumentSubmissionStatus(true)
+            session.setDocumentsValidationStatus("PENDING_VALIDATION")
             startActivity(Intent(this,MapsActivity::class.java))
 
             finish()

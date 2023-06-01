@@ -32,6 +32,8 @@ class UserMenuActivity : AppCompatActivity() {
             session.setToken(null)
             session.setActiveSubscription(null)
             session.setCurrentRentalSession(null)
+            session.setDocumentsValidationStatus(null)
+            session.setDocumentSubmissionStatus(false)
 
             val resultIntent = Intent()
             resultIntent.putExtra("status",this.getString(R.string.LOGOUT_OK))

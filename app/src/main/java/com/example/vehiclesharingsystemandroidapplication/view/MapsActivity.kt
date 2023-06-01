@@ -102,8 +102,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
         setUpMap()
         mMap.uiSettings.isZoomControlsEnabled = true
 
-
-
         // In this case, the user has already given the permissions, thus there is a need to check them.
         runBlocking {
             if (ActivityCompat.checkSelfPermission(this@MapsActivity,
@@ -314,14 +312,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
 
     private fun moveCameraToCurrentLocation(){
         fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, null).addOnCompleteListener {
-            mMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        it.result.latitude,
-                        it.result.longitude
-                    ), 11.0f
+            if (it.result == null) {
+                Toast.makeText(this,"Please enable location services",Toast.LENGTH_LONG).show()
+            } else {
+                mMap.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            it.result.latitude,
+                            it.result.longitude
+                        ), 11.0f
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -375,14 +377,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
                 findViewById<ImageButton>(R.id.currentRentalActivityImageButton).visibility =
                     INVISIBLE
                 if(!session!!.getLastRentedVehicle().isNullOrEmpty()){
-////                    val veh = session!!.getLastRentedVehicle()
-////                        ?.let { Vehicle.fromJsonString(it) }
-////                    if(!markers.containsKey(veh!!.vin)) {
-////                        mMap.addMarker(MarkerOptions().position(veh.location))
-////                            ?.let {
-////                                markers.putIfAbsent(veh.vin, it)
-////                            }
-////                    }
                     session!!.setLastRentedVehicle(null)
                }
             }

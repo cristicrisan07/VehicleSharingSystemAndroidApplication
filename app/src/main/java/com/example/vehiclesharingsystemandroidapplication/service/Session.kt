@@ -55,7 +55,7 @@ class Session(context: Context?){
         return prefs!!.getBoolean("submittedDocumentsStatus",false)
     }
 
-    fun setDocumentsValidationStatus(status: String){
+    fun setDocumentsValidationStatus(status: String?){
         prefs!!.edit().putString("documentsValidationStatus",status).apply()
     }
 
