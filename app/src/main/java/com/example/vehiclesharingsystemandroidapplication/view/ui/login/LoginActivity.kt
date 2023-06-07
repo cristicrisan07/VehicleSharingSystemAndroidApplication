@@ -10,10 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import com.example.vehiclesharingsystemandroidapplication.databinding.ActivityLoginBinding
 
 import com.example.vehiclesharingsystemandroidapplication.R
@@ -34,6 +33,7 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
     private lateinit var session: Session
+    private lateinit var loading: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
         val password = binding.password
         val login = binding.login
         val register = binding.register
-        val loading = binding.loading
+        loading = binding.loading!!
         session = Session(this)
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory(this))[LoginViewModel::class.java]
@@ -66,17 +66,19 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
 
         loginViewModel.loginResult.observe(this@LoginActivity, Observer {
             val loginResult = it ?: return@Observer
-
             if (loginResult.error != null) {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                loading.visibility = View.INVISIBLE
                 showLoginFailed(loginResult.error)
             }
             if (loginResult.success != null) {
                 if(loginResult.success is LoggedInUser) {
                     DriverService.setSessionWithUsernameAndToken(session,username.text.toString(), loginResult.success.token)
-                    DriverService.getAndSetDriverSubscriptionFromServer(session,this@LoginActivity)
                     updateUiWithUser(loginResult.success)
                 }else{
                     if(loginResult.success is String){
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                        loading.visibility = View.INVISIBLE
                         showUsernameTaken(loginResult.success)
                     }
                 }
@@ -111,10 +113,17 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 loginViewModel.login(username.text.toString(), password.text.toString())
             }
 
             register!!.setOnClickListener {
+                loading.visibility = View.VISIBLE
+                window.setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 loginViewModel.checkUsername(username.text.toString(), password.text.toString())
             }
         }
@@ -168,8 +177,10 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
                 } else {
                     startActivity(Intent(this, VerifyIdentityActivity::class.java))
                     session.setDocumentSubmissionStatus(false)
+
                 }
             } else {
+
                 if(response == "INVALID"){
                     startActivity(Intent(this, VerifyIdentityActivity::class.java))
                 }else{
@@ -182,7 +193,12 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
             Toast.makeText(this, result.toString(), Toast.LENGTH_LONG).show()
         }
     }
+    override fun onResume() {
+        loading.visibility = View.INVISIBLE
+        super.onResume()
+    }
 }
+
 
 
 /**

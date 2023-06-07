@@ -14,7 +14,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="17dp"
         android:layout_marginTop="32dp"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@+id/seatsLabel"
         app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
 
@@ -36,7 +36,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:text="@string/maximum_authorised_mass_label"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@id/seatsTextView"
         app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
 
@@ -47,7 +47,7 @@
         android:layout_marginStart="17dp"
         android:layout_marginTop="32dp"
         android:text="@string/nb_seats_label"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
 
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@+id/maximumMassLabel"
         app:layout_constraintTop_toTopOf="@id/manufacturerModelAndYearlTextView" />
 
@@ -68,7 +68,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:text="@string/horse_power_label"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/seatsLabel" />
 
@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@+id/hpLabel"
         app:layout_constraintTop_toTopOf="@+id/maximumMassLabel" />
 
@@ -89,7 +89,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:text="@string/torque_label"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@id/hpTextView"
         app:layout_constraintTop_toTopOf="@+id/maximumMassLabel" />
 
@@ -99,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@+id/torqueLabel"
         app:layout_constraintTop_toTopOf="@+id/maximumMassLabel" />
 
@@ -110,7 +110,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:text="@string/range_left_label"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/hpLabel" />
 
@@ -120,7 +120,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@+id/rangeLeftLabel"
         app:layout_constraintTop_toTopOf="@+id/torqueLabel" />
 
@@ -131,7 +131,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:text="@string/price_label"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@+id/rangeLeftTextView"
         app:layout_constraintTop_toTopOf="@+id/torqueTextView" />
 
@@ -141,7 +141,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:textColor="#000000"
+        android:textColor="@color/teal_700"
         app:layout_constraintStart_toEndOf="@+id/priceLabel"
         app:layout_constraintTop_toTopOf="@+id/torqueTextView" />
 

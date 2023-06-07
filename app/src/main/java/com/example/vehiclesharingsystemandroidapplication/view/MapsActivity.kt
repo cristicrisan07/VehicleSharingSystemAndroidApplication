@@ -138,6 +138,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
                 setResult(RESULT_OK)
             }
         }else {
+            DriverService.getAndSetDriverSubscriptionFromServer(session!!,this@MapsActivity)
             goBackToLoginFromMapsButton.visibility = INVISIBLE
             token = session!!.getToken().toString()
             userMenu.visibility = VISIBLE

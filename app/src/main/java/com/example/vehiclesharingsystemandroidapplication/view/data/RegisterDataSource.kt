@@ -22,10 +22,56 @@ class RegisterDataSource(context: Context) {
                 Method.POST,
                 currentContext.getString(R.string.registerPath),
                 { response->
-                    volleyListener.requestFinished(Result.Success(LoggedInUser(driver.account.username,response)))
+                    if(response.contains("ERROR")){
+                        if(!(response.contains("EMAIL_TAKEN") || response.contains("PHONE_NUMBER_TAKEN"))){
+                            val stringRequest: StringRequest = object: StringRequest(
+                                Method.POST,
+                                currentContext.getString(R.string.loginPath),
+                                { response->
+                                    volleyListener.requestFinished(Result.Success(LoggedInUser(driver.account.username,response)))
+                                },
+                                {error->
+                                    volleyListener.requestFinished(Result.Error(IOException("Error logging in", error)))
+                                }){
+
+                                override fun getBody(): ByteArray {
+                                    val accountDTO = JSONObject()
+                                    accountDTO.put("username",driver.account.username)
+                                    accountDTO.put("password",driver.account.password)
+                                    accountDTO.put("accountType",currentContext.getString(R.string.account_type_driver))
+                                    return accountDTO.toString().toByteArray(Charset.forName("utf-8"))
+
+                                }
+
+                                override fun getHeaders(): MutableMap<String, String> {
+                                    val params=HashMap<String,String>();
+                                    params["Content-Type"] = "application/json"
+                                    params["Accept"] = "application/json"
+                                    return params
+                                }
+                            }
+                            SingletonRQ.getInstance(currentContext).addToRequestQueue(stringRequest)
+                        }
+                        else{
+                            volleyListener.requestFinished(
+                                Result.Success(
+                                    response
+                                )
+                            )
+                        }
+                    }else {
+                        volleyListener.requestFinished(
+                            Result.Success(
+                                LoggedInUser(
+                                    driver.account.username,
+                                    response
+                                )
+                            )
+                        )
+                    }
                 },
                 {error->
-                    volleyListener.requestFinished(Result.Error(IOException("Error logging in", error)))
+                    volleyListener.requestFinished(Result.Error(IOException("Error registering.", error)))
                 }){
 
                 override fun getBody(): ByteArray {

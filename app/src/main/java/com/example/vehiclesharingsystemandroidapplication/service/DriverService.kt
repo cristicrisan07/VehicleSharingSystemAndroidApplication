@@ -27,16 +27,24 @@ class DriverService {
         }
         fun getAndSetDriverSubscriptionFromServer(session: Session,context: Context) {
             val token = session.getToken()
-            val stringRequest: JsonArrayRequest = object: JsonArrayRequest(
+            val stringRequest: JsonObjectRequest = object: JsonObjectRequest(
                 Method.GET,
                 context.getString(R.string.getDriverSubscription)+session.getUsername(),
                 null,
                 { response->
-                    if(response != null) {
+                    if(response.getString("startDate") != "") {
                         session.setActiveSubscription(response.toString())
+                    }else{
+                        if(response.getString("id") == "SUBSCRIPTION_EXPIRED"){
+                            Toast.makeText(context, "Your subscription has expired", Toast.LENGTH_SHORT).show()
+                            session.setActiveSubscription(null)
+                        }
                     }
+
                 },
-                {}){
+                {error->
+                    Toast.makeText(context, "Could not fetch subscription status", Toast.LENGTH_SHORT).show()
+                }){
                 override fun getHeaders(): MutableMap<String, String> {
                     val params=HashMap<String,String>()
                     params["Content-Type"] = "application/json"
@@ -173,7 +181,8 @@ class DriverService {
                         volleyListener.requestFinished(Result.Success(response))
                 },
                 {error->
-                    volleyListener.requestFinished(Result.Error(Exception(error)))}){
+                    volleyListener.requestFinished(Result.Error(Exception(error)))
+                }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     val params=HashMap<String,String>()
                     params["Content-Type"] = "application/json"
@@ -185,14 +194,13 @@ class DriverService {
             SingletonRQ.getInstance(context).addToRequestQueue(stringRequest)
         }
 
-        fun sendDrivingLicense(session: Session, context: Context,photoFront: String, photoBack: String, volleyListener: VolleyListener){
+        fun sendDrivingLicense(session: Session, context: Context,photoFront: String, photoBack: String, photoID: String, volleyListener: VolleyListener){
             val token = session.getToken()
             val stringRequest: StringRequest = object: StringRequest(
                 Method.POST,
                 context.getString(R.string.addDrivingLicenseToDriver),
                 { response->
                     volleyListener.requestFinished(Result.Success(response))
-
                 },
                 {error->
                     volleyListener.requestFinished(Result.Error(Exception(error)))
@@ -202,6 +210,7 @@ class DriverService {
                     identityValidationDocumentDTO.put("username",session.getUsername())
                     identityValidationDocumentDTO.put("photoFront",photoFront)
                     identityValidationDocumentDTO.put("photoBack",photoBack)
+                    identityValidationDocumentDTO.put("photoIDCard",photoID)
                     return identityValidationDocumentDTO.toString().toByteArray(Charset.forName("utf-8"))
                 }
                 override fun getHeaders(): MutableMap<String, String> {

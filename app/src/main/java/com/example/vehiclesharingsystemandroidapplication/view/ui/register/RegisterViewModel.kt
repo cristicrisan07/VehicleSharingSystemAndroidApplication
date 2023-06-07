@@ -47,13 +47,12 @@ class RegisterViewModel(private val registerRepository: RegisterRepository): Vie
 
     override fun requestFinished(result: Result<Any>) {
         if (result is Result.Success) {
-            if(result.data is LoggedInUser) {
-                val resultData = result.data
-                _registerResult.value =
-                    LoginResult(success = resultData)
+            val resultData = result.data
+            _registerResult.value =
+                LoginResult(success = resultData)
             }
-        } else {
-            _registerResult.value = LoginResult(error = R.string.login_failed)
+         else {
+            _registerResult.value = LoginResult(error = R.string.register_failed)
         }
     }
 

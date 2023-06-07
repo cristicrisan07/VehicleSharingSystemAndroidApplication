@@ -1,14 +1,17 @@
 package com.example.vehiclesharingsystemandroidapplication.view
 
 import android.app.Activity
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothSocket
+import android.content.Context
 import android.content.Intent
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View.INVISIBLE
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.vehiclesharingsystemandroidapplication.R
 import com.example.vehiclesharingsystemandroidapplication.model.RentalSession
@@ -16,20 +19,19 @@ import com.example.vehiclesharingsystemandroidapplication.model.Vehicle
 import com.example.vehiclesharingsystemandroidapplication.service.DriverService
 import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.view.data.Result
-import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
 import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
-import com.example.vehiclesharingsystemandroidapplication.view.ui.login.LoginResult
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.*
 import org.json.JSONObject
+import java.io.DataOutputStream
+import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.temporal.TemporalField
-import kotlin.coroutines.CoroutineContext
-import kotlin.properties.Delegates
+import java.util.*
+
 
 class RentalSessionActivity : AppCompatActivity(),VolleyListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -41,6 +43,8 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
     private lateinit var session: Session
     private lateinit var resultLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
     private var count: Boolean = true
+    private val generalUuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +58,14 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
         price = findViewById(R.id.priceTextViewRentalSession)
         distanceTravelledTextView = findViewById(R.id.distanceTravelledTextView)
         amountToPayTextView = findViewById(R.id.amountToPayTextView)
+        if(session.getActiveSubscription() != null) {
+            price.visibility = INVISIBLE
+            amountToPayTextView.visibility = INVISIBLE
+            val priceLabelRentalSession = findViewById<TextView>(R.id.priceLabelRentalSession)
+            val amountToPayLabel = findViewById<TextView>(R.id.amountToPayLabel)
+            priceLabelRentalSession.visibility = INVISIBLE
+            amountToPayLabel.visibility = INVISIBLE
+        }
 
         lifecycleScope.launch {
         startRentalInformationLiveUpdates()
@@ -95,6 +107,39 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
                 )
             }
         }
+
+        val unlockCarButton = findViewById<Button>(R.id.unlockCarButton)
+        unlockCarButton.setOnClickListener {
+            val socket: BluetoothSocket? = getBluetoothSocket()
+            socket?.connect()
+            val dos = DataOutputStream(socket?.outputStream)
+            session.getUsername()?.toCharArray()?.
+                forEach { character -> dos.writeChar(character.code) }
+            socket?.close()
+        }
+
+
+    }
+    private fun getBluetoothSocket(): BluetoothSocket? {
+        val bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val mBluetoothAdapter = bluetoothManager.adapter
+        mBluetoothAdapter.cancelDiscovery()
+        val pairedDevices = mBluetoothAdapter.bondedDevices
+        // If there are paired devices
+        if (pairedDevices.size > 0) {
+            // Loop through paired devices
+            for (device in pairedDevices) {
+                // Add the name and address to an array adapter to show in a ListView
+                if (device.name.equals("DESKTOP-V27P7JH", ignoreCase = true)) {
+                    return try {
+                        device.createRfcommSocketToServiceRecord(generalUuid)
+                    } catch (e: IOException) {
+                        null
+                    }
+                }
+            }
+        }
+        return null
     }
 
     private suspend fun startRentalInformationLiveUpdates() {

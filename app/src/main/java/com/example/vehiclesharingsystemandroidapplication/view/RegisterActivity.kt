@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -17,10 +18,7 @@ import com.example.vehiclesharingsystemandroidapplication.model.ApplicationAccou
 import com.example.vehiclesharingsystemandroidapplication.model.Driver
 import com.example.vehiclesharingsystemandroidapplication.service.DriverService
 import com.example.vehiclesharingsystemandroidapplication.service.Session
-import com.example.vehiclesharingsystemandroidapplication.view.data.Result
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
-import com.example.vehiclesharingsystemandroidapplication.view.ui.VolleyListener
-import com.example.vehiclesharingsystemandroidapplication.view.ui.login.LoggedInUserView
 import com.example.vehiclesharingsystemandroidapplication.view.ui.login.afterTextChanged
 import com.example.vehiclesharingsystemandroidapplication.view.ui.register.RegisterViewModel
 import com.example.vehiclesharingsystemandroidapplication.view.ui.register.RegisterViewModelFactory
@@ -43,13 +41,16 @@ class RegisterActivity : AppCompatActivity() {
         val lastName = findViewById<EditText>(R.id.last_name)
         val phoneNumber = findViewById<EditText>(R.id.phone_number_text)
         val email = findViewById<EditText>(R.id.email_text)
-        val loading = findViewById<ProgressBar>(R.id.loading)
+        val loading = findViewById<ProgressBar>(R.id.loading_subscriptions)
         session = Session(this)
 
         val registerButton = findViewById<Button>(R.id.registerButton)
 
         registerButton.setOnClickListener {
             loading.visibility = View.VISIBLE
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             registerViewModel.register(Driver(ApplicationAccount(username, password,phoneNumber.text.toString(),email.text.toString()),firstName.text.toString(),lastName.text.toString(),null,null))
         }
 
@@ -74,22 +75,32 @@ class RegisterActivity : AppCompatActivity() {
         })
 
         registerViewModel.registerResult.observe(this@RegisterActivity, Observer {
+
             val registerResult = it ?: return@Observer
 
             if(registerResult.error != null){
+                loading.visibility = View.INVISIBLE
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 showRegisterFailed(registerResult.error)
             }
             if(registerResult.success != null){
                 if(registerResult.success is LoggedInUser) {
                     DriverService.setSessionWithUsernameAndToken(session,username, registerResult.success.token)
-                    DriverService.getAndSetDriverSubscriptionFromServer(session,this@RegisterActivity)
                     updateUiWithUser(registerResult.success)
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                }else{
+                    if(registerResult.success is String) {
+                        if(registerResult.success.contains("ERROR")){
+                            showRegisterFailed(registerResult.success)
+                            loading.visibility = View.INVISIBLE
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                        }
+                    }
                 }
-            }
-            setResult(Activity.RESULT_OK)
 
-            //Complete and destroy login activity once successful
-            finish()
+            }
+
         })
 
         firstName.afterTextChanged {
@@ -107,6 +118,9 @@ class RegisterActivity : AppCompatActivity() {
 
     }
     private fun showRegisterFailed(@StringRes errorString: Int) {
+        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
+    }
+    private fun showRegisterFailed(errorString: String) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 

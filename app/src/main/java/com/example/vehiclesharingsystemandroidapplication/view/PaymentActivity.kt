@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -59,6 +60,9 @@ class PaymentActivity : AppCompatActivity() {
                         PaymentStatus.FAILURE
                     else PaymentStatus.SUCCESS
                     if (status == PaymentStatus.SUCCESS) {
+                        window.setFlags(
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         Toast.makeText(applicationContext, "Payment Successful", Toast.LENGTH_LONG).show()
                         val keygen = KeyGenerator.getInstance("AES")
                         keygen.init(256)

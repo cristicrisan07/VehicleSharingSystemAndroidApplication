@@ -59,7 +59,7 @@
             app:layout_constraintVertical_bias="0.2" />
 
         <ProgressBar
-            android:id="@+id/loading"
+            android:id="@+id/loading_subscriptions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

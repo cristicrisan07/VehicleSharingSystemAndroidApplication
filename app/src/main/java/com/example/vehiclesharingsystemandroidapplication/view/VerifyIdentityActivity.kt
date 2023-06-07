@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -34,9 +35,11 @@ import java.lang.ref.WeakReference
 class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
     private var encodedPhotoFront: String? = null
     private var encodedPhotoBack: String? = null
+    private var encodedPhotoID: String? = null
     private lateinit var submitButton:Button
     private lateinit var takeFrontPhotoButton:Button
     private lateinit var takeBackPhotoButton:Button
+    private lateinit var takeIDPhotoButton:Button
     private lateinit var session:Session
     private lateinit var imageUri:Uri
 
@@ -59,9 +62,33 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
         }
             takeBackPhotoButton.isEnabled = false
             takeBackPhotoButton.text = this.getString(R.string.take_photo_back_button_taken)
-            if(encodedPhotoFront!=null){
+            if(encodedPhotoFront !=null && encodedPhotoID !=null){
                 submitButton.isEnabled = true
             }
+    }
+
+    private var resultLauncherID: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        var bitmap: Bitmap? = null
+        val contentResolver = contentResolver
+        try {
+            bitmap = if (Build.VERSION.SDK_INT < 28) {
+                MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+            } else {
+                val source: ImageDecoder.Source =
+                    ImageDecoder.createSource(contentResolver, imageUri)
+                ImageDecoder.decodeBitmap(source)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        encodedPhotoID = bitmap?.let {
+                it -> encodeImage(it)
+        }
+        takeIDPhotoButton.isEnabled = false
+        takeIDPhotoButton.text = this.getString(R.string.take_photo_front_button_taken)
+        if(encodedPhotoFront !=null && encodedPhotoBack !=null){
+            submitButton.isEnabled = true
+        }
     }
 
     private var resultLauncherFront: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -83,7 +110,7 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
             }
             takeFrontPhotoButton.isEnabled = false
             takeFrontPhotoButton.text = this.getString(R.string.take_photo_front_button_taken)
-        if(encodedPhotoBack!=null){
+        if(encodedPhotoBack!=null && encodedPhotoID !=null){
             submitButton.isEnabled = true
         }
 
@@ -106,15 +133,22 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
         takeBackPhotoButton.setOnClickListener {
             openCameraForPicture("back")
         }
+        takeIDPhotoButton = findViewById(R.id.takePhotoIDButton)
+        takeIDPhotoButton.setOnClickListener {
+            openCameraForPicture("id")
+        }
 
         submitButton = findViewById(R.id.submitButton)
         submitButton.isEnabled = false
         submitButton.setOnClickListener {
-                if(encodedPhotoFront!= null && encodedPhotoBack !=null){
+                if(encodedPhotoFront!= null && encodedPhotoBack !=null && encodedPhotoID != null){
                     DriverService.sendDrivingLicense(session,
-                    this,encodedPhotoFront!!,encodedPhotoBack!!,this as VolleyListener)
+                    this,encodedPhotoFront!!,encodedPhotoBack!!,encodedPhotoID!!,this as VolleyListener)
+                    window.setFlags(
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 }else{
-                    Toast.makeText(this, "Please take a photo of both sides before submitting", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Please take a photo of all documents before submitting", Toast.LENGTH_SHORT).show()
                 }
            }
         if(session.getDocumentsValidationStatus() == "INVALID") {
@@ -141,9 +175,15 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
                         resultLauncherFront?.launch(intent)
                     }else{
-                        imageUri = createImageFile("back")
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-                        resultLauncherBack?.launch(intent)
+                        if(side == "back") {
+                            imageUri = createImageFile("back")
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                            resultLauncherBack?.launch(intent)
+                        }else{
+                            imageUri = createImageFile("id")
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                            resultLauncherID?.launch(intent)
+                        }
                     }
                 }
             }else{
@@ -197,6 +237,7 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
             finish()
             setResult(RESULT_OK)
         }else{
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             Toast.makeText(this,result.toString(), Toast.LENGTH_LONG).show()
         }
     }

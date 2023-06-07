@@ -1,16 +1,20 @@
 package com.example.vehiclesharingsystemandroidapplication.view
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View.INVISIBLE
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import com.example.vehiclesharingsystemandroidapplication.R
 import com.example.vehiclesharingsystemandroidapplication.model.Vehicle
 import com.example.vehiclesharingsystemandroidapplication.service.DriverService
@@ -56,16 +60,55 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
         rangeLeft.text = vehicle.rangeLeftInKm
         price.text = vehicle.price.toString()
 
+        if(session.getActiveSubscription() != null){
+            price.visibility = INVISIBLE
+            val priceLabel = findViewById<TextView>(R.id.priceLabel)
+            priceLabel.visibility = INVISIBLE
+        }
+
         if(!session.getUsername().isNullOrEmpty()){
             if(session.getDocumentsValidationStatus() == "VALID") {
                 if (session.getCurrentRentalSession().isNullOrEmpty()) {
                     startRentalButton.setOnClickListener {
-                        DriverService.startDriverRentalSession(
-                            Session(this),
-                            this,
-                            vehicle,
-                            this as VolleyListener
-                        )
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            if (ActivityCompat.checkSelfPermission(
+                                    this,
+                                    Manifest.permission.BLUETOOTH_SCAN
+                                ) != PackageManager.PERMISSION_GRANTED ||
+                                ActivityCompat.checkSelfPermission(
+                                    this,
+                                    Manifest.permission.BLUETOOTH_ADVERTISE
+                                ) != PackageManager.PERMISSION_GRANTED ||
+                                ActivityCompat.checkSelfPermission(
+                                    this,
+                                    Manifest.permission.BLUETOOTH_CONNECT
+                                ) != PackageManager.PERMISSION_GRANTED
+                            ) {
+                                ActivityCompat.requestPermissions(
+                                    this,
+                                    arrayOf(
+                                        Manifest.permission.BLUETOOTH_SCAN,
+                                        Manifest.permission.BLUETOOTH_ADVERTISE,
+                                        Manifest.permission.BLUETOOTH_CONNECT
+                                    ),
+                                    BLUETOOTH_REQUEST_CODE
+                                )
+                            } else {
+                                DriverService.startDriverRentalSession(
+                                    Session(this),
+                                    this,
+                                    vehicle,
+                                    this as VolleyListener
+                                )
+                            }
+                        }else{
+                            DriverService.startDriverRentalSession(
+                                Session(this),
+                                this,
+                                vehicle,
+                                this as VolleyListener
+                            )
+                        }
                     }
                 } else{
                     startRentalButton.isEnabled = false
@@ -81,6 +124,10 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
         }
 
 
+    }
+
+    companion object {
+        private const val BLUETOOTH_REQUEST_CODE = 1
     }
 
     override fun requestFinished(result: Result<Any>) {
@@ -102,5 +149,26 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
         } else {
             Toast.makeText(this,result.toString(), Toast.LENGTH_LONG).show()
         }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if(requestCode == BLUETOOTH_REQUEST_CODE){
+            if(grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                DriverService.startDriverRentalSession(
+                    Session(this),
+                    this,
+                    vehicle,
+                    this as VolleyListener
+                )
+            }
+            else{
+                Toast.makeText(this, "Please allow the app to use BLUETOOTH to start renting vehicles", Toast.LENGTH_SHORT).show()
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

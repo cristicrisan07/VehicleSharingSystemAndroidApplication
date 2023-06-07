@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="146dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="36dp"
         android:layout_marginEnd="146dp"
         android:text="@string/identity_verification_needed"
         android:textAlignment="center"
@@ -25,25 +25,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="112dp"
-        android:layout_marginTop="125dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="112dp"
         android:text="@string/photographic_suggestion"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.533"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/identityValidationNeededTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/submitButton" />
 
     <Button
         android:id="@+id/takePhotoFrontButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="112dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="112dp"
         android:text="@string/take_photo_front_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photographicSuggestionTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/drivingLicenseRequiredTextView" />
 
     <Button
         android:id="@+id/takePhotoBackButton"
@@ -63,10 +65,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="112dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="100dp"
         android:layout_marginEnd="112dp"
         android:text="@string/submit_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.531"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/takePhotoIDButton" />
+
+    <Button
+        android:id="@+id/takePhotoIDButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="155dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="155dp"
+        android:text="@string/take_photo_front_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/validationForIdNeededTextView" />
+
+    <TextView
+        android:id="@+id/validationForIdNeededTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="150dp"
+        android:text="@string/identity_verification_needed_id"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/takePhotoBackButton" />
+
+    <TextView
+        android:id="@+id/drivingLicenseRequiredTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="150dp"
+        android:text="@string/driving_license_required_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/identityValidationNeededTextView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

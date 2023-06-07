@@ -28,7 +28,7 @@ class Session(context: Context?){
     }
 
     fun getActiveSubscription():String?{
-        return prefs!!.getString("activeSubscription","")
+        return prefs!!.getString("activeSubscription",null)
     }
 
     fun setCurrentRentalSession(jsonStringRentalSession: String?){
