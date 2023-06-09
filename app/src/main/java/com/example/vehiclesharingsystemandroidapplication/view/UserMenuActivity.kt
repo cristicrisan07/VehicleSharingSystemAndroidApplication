@@ -2,11 +2,10 @@ package com.example.vehiclesharingsystemandroidapplication.view
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.vehiclesharingsystemandroidapplication.R
 import com.example.vehiclesharingsystemandroidapplication.model.ActiveSubscription
 import com.example.vehiclesharingsystemandroidapplication.service.Session
@@ -33,9 +32,6 @@ class UserMenuActivity : AppCompatActivity() {
 
         findViewById<ImageButton>(R.id.userMenuLogOutImageButton).setOnClickListener {
 
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-
             session.setLastRentedVehicle(null)
             session.setUsername(null)
             session.setToken(null)
@@ -43,6 +39,10 @@ class UserMenuActivity : AppCompatActivity() {
             session.setCurrentRentalSession(null)
             session.setDocumentsValidationStatus(null)
             session.setDocumentSubmissionStatus(false)
+
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
 
             val resultIntent = Intent()
             resultIntent.putExtra("status",this.getString(R.string.LOGOUT_OK))

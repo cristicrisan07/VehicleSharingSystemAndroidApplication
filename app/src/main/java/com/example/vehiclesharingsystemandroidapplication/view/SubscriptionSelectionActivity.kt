@@ -35,6 +35,8 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
     private var selectedSubscriptionIndex: Int? = null
     private lateinit var loading:ProgressBar
     private lateinit var session: Session
+    private lateinit var goToPaymentButton:Button
+
 
     val dtoConverter = DtoConverter()
 
@@ -54,10 +56,6 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
                     selectedSubscriptionIndex?.let {value->
                         subscriptionsArrayList?.get(value)?.rentalSubscription?.let { rentalSubscription ->
                             data.getStringExtra("encryptedCardNumber")?.let { it ->
-                                loading.visibility = View.VISIBLE
-                                window.setFlags(
-                                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                                 addSubscriptionToDriver(username!!,
                                     rentalSubscription.id, it,
                                     rentalSubscription.rentalPrice.value.toString(),token!!
@@ -78,12 +76,19 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
                         it
                     )
                 } else null
-
-        val goToPaymentButton = findViewById<Button>(R.id.goPaySubscriptionButton)
+        goToPaymentButton = findViewById(R.id.goPaySubscriptionButton)
+        goToPaymentButton.isEnabled = false
         if(activeSubscription == null){
             goToPaymentButton.setOnClickListener {
-                val intent = Intent(this,PaymentActivity::class.java)
-                resultLauncher.launch(intent)
+
+                    loading.visibility = View.VISIBLE
+                    window.setFlags(
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                    )
+                    val intent = Intent(this, PaymentActivity::class.java)
+                    resultLauncher.launch(intent)
+
             }
         }else{
             goToPaymentButton.text = "Come back on " +
@@ -120,6 +125,8 @@ class SubscriptionSelectionActivity : AppCompatActivity() {
 
                     listViewReference!!.setOnItemClickListener { parent,view,position,id ->
                         subscriptionsArrayList!![position].selected=!subscriptionsArrayList!![position].selected
+                        goToPaymentButton.isEnabled = subscriptionsArrayList!![position].selected
+
                         selectedSubscriptionIndex = position
                         for(i in 0 until subscriptionsArrayList!!.size){
                             if(i != position){

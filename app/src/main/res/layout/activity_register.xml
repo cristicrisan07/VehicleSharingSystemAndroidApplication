@@ -118,16 +118,15 @@
         android:layout_width="255dp"
         android:layout_height="48dp"
         android:layout_marginStart="78dp"
-        android:layout_marginTop="650dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="78dp"
         android:layout_marginBottom="44dp"
+        android:enabled="false"
         android:text="@string/registerButtonInActivity"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:enabled="false"/>
+        app:layout_constraintTop_toBottomOf="@+id/loading_subscriptions" />
 
     <TextView
         android:id="@+id/moreInfoBadge"
@@ -147,10 +146,10 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="175dp"
-        android:layout_marginTop="350dp"
+        android:layout_marginStart="180dp"
+        android:layout_marginTop="8dp"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/email_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

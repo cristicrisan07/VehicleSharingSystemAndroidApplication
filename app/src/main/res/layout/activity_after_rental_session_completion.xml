@@ -17,10 +17,10 @@
         app:layout_constraintHorizontal_bias="0.52"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/check_mark" />
+        android:src="@drawable/check_mark" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/continueToMapButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="90dp"
@@ -29,6 +29,21 @@
         android:layout_marginBottom="48dp"
         android:text="@string/continue_to_map"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkMarkImageView" />
+
+    <TextView
+        android:id="@+id/successfullyEndedRentalSessionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="175dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="175dp"
+        android:gravity="center"
+        android:text="@string/successfullyEndedRentalSessionText"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkMarkImageView" />

@@ -42,7 +42,8 @@
 
         <activity
             android:name=".view.VerifyIdentityActivity"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/Theme.VehicleSharingSystemAndroidApplication.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -57,21 +58,24 @@
         </activity>
         <activity
             android:name=".view.PaymentActivity"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/Theme.VehicleSharingSystemAndroidApplication.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".view.SubscriptionSelectionActivity"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/Theme.VehicleSharingSystemAndroidApplication.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".view.UserMenuActivity"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/Theme.VehicleSharingSystemAndroidApplication.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -94,7 +98,8 @@
         </activity>
         <activity
             android:name=".view.RegisterActivity"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/Theme.VehicleSharingSystemAndroidApplication.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

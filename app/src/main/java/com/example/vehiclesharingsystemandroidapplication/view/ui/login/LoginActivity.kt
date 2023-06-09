@@ -1,27 +1,25 @@
 package com.example.vehiclesharingsystemandroidapplication.view.ui.login
 
-import android.app.Activity
 import android.content.Intent
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
-import android.widget.*
-import com.example.vehiclesharingsystemandroidapplication.databinding.ActivityLoginBinding
-
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.vehiclesharingsystemandroidapplication.R
-import com.example.vehiclesharingsystemandroidapplication.model.Driver
-import com.example.vehiclesharingsystemandroidapplication.model.RentalSession
+import com.example.vehiclesharingsystemandroidapplication.databinding.ActivityLoginBinding
 import com.example.vehiclesharingsystemandroidapplication.service.DriverService
 import com.example.vehiclesharingsystemandroidapplication.service.Session
 import com.example.vehiclesharingsystemandroidapplication.view.MapsActivity
-import com.example.vehiclesharingsystemandroidapplication.view.RegisterActivity
 import com.example.vehiclesharingsystemandroidapplication.view.VerifyIdentityActivity
 import com.example.vehiclesharingsystemandroidapplication.view.data.Result
 import com.example.vehiclesharingsystemandroidapplication.view.data.model.LoggedInUser
@@ -39,6 +37,7 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
         super.onCreate(savedInstanceState)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
+        supportActionBar?.hide()
         setContentView(binding.root)
 
         val username = binding.username

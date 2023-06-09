@@ -245,7 +245,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
             if (it.isNotEmpty()) {
                 currentRentalSession = RentalSession.fromJSONString(it)
                 if (currentRentalSession.endTime != null) {
-                    if (session!!.getActiveSubscription() == "") {
+                    if (session!!.getActiveSubscription() == null) {
                         val intent = Intent(this, PaymentActivity::class.java)
                         intent.putExtra("amount", currentRentalSession.cost)
                         resultLauncher.launch(intent)

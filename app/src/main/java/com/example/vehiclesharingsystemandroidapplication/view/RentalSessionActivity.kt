@@ -166,7 +166,7 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
             if (resultJSONObject.getString("source") == "rentalSessionEndCall"){
                 val response = resultJSONObject.getString("response")
                 if (response.contains("SUCCESS")) {
-                    if (session.getActiveSubscription() == "") {
+                    if (session.getActiveSubscription() == null) {
                         val intent = Intent(this, PaymentActivity::class.java)
                         intent.putExtra("amount",currentRentalSession.cost)
                         resultLauncher.launch(intent)
@@ -177,11 +177,6 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
                             "",
                             currentRentalSession.cost,
                             this as VolleyListener)
-                        val intent = Intent(this, AfterRentalSessionCompletionActivity::class.java)
-                        startActivity(intent)
-
-                        setResult(Activity.RESULT_OK)
-                        finish()
                     }
                 } else {
                     Toast.makeText(this, resultData, Toast.LENGTH_LONG).show()

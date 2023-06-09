@@ -10,46 +10,34 @@
         android:id="@+id/userMenuSubscriptionsLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="38dp"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="28dp"
         android:text="@string/user_menu_subscriptions_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userMenuSubscriptionsImageButton" />
-
-    <ImageButton
-        android:id="@+id/userMenuMyAccountImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userMenuUsernameTextView"
-        tools:ignore="SpeakableTextPresentCheck"
-        tools:srcCompat="@drawable/delete_account" />
+        app:layout_constraintTop_toBottomOf="@+id/userMenuSubscriptionsImageButton" />
 
     <ImageButton
         android:id="@+id/userMenuSubscriptionsImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="100dp"
+        android:background="@null"
+        android:src="@drawable/subscription_model"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userMenuUsernameTextView"
-        tools:ignore="SpeakableTextPresentCheck"
-        tools:srcCompat="@drawable/subscription_model" />
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <ImageButton
         android:id="@+id/userMenuLogOutImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="161dp"
-        android:layout_marginEnd="161dp"
-        android:layout_marginBottom="96dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="27dp"
+        android:background="@null"
+        android:src="@drawable/logout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/common_full_open_on_phone"
+        app:layout_constraintTop_toBottomOf="@+id/userMenuUsernameTextView"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <ImageView
@@ -72,29 +60,18 @@
         android:layout_marginStart="25dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="25dp"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mainUserInfoImageView" />
 
     <TextView
-        android:id="@+id/userMenuMyAccountLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="42dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/user_menu_my_account_label"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userMenuMyAccountImageButton" />
-
-    <TextView
         android:id="@+id/userMenuLogOutLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="176dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="176dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="52dp"
         android:text="@string/user_menu_logout_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userMenuLogOutImageButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>
