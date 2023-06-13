@@ -71,10 +71,12 @@ class DriverService {
                 Method.POST,
                 context.getString(R.string.startRentalSession),
                 { response->
-                    val res = response.split("SUCCESS:")[1]
-                    val rentalSession = RentalSession(res,vehicle, startTime,null,0.0)
-                    session.setCurrentRentalSession(rentalSession.toJsonString())
-                    session.setLastRentedVehicle(vehicle.toJsonString())
+                    if(response.toString().contains("SUCCESS")) {
+                        val res = response.split("SUCCESS:")[1]
+                        val rentalSession = RentalSession(res, vehicle, startTime, null, 0.0)
+                        session.setCurrentRentalSession(rentalSession.toJsonString())
+                        session.setLastRentedVehicle(vehicle.toJsonString())
+                    }
                     volleyListener.requestFinished(Result.Success(response))
                 },
                 {error->

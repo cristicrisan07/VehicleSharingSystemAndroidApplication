@@ -126,7 +126,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loading_subscriptions" />
+        app:layout_constraintTop_toBottomOf="@+id/loading_register" />
 
     <TextView
         android:id="@+id/moreInfoBadge"
@@ -142,7 +142,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
-        android:id="@+id/loading_subscriptions"
+        android:id="@+id/loading_register"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

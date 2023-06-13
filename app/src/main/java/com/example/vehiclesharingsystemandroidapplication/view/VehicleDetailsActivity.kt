@@ -9,8 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.WindowManager
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +29,7 @@ import kotlin.math.max
 
 class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
     private lateinit var vehicle: Vehicle
+    private lateinit var loading: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +55,7 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
         val rangeLeft = findViewById<TextView>(R.id.rangeLeftTextView)
         val price = findViewById<TextView>(R.id.priceTextView)
         val startRentalButton = findViewById<Button>(R.id.startRentalSessionButton)
+        loading = findViewById(R.id.loadingAtVehicleDetails)
 
         firstLine.text = getString(R.string.manufacturerModelYearText,vehicle.manufacturer,vehicle.model,vehicle.yearOfManufacture)
         seats.text = vehicle.numberOfSeats
@@ -94,6 +99,10 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
                                     BLUETOOTH_REQUEST_CODE
                                 )
                             } else {
+                                loading.visibility = VISIBLE
+                                window.setFlags(
+                                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                                 DriverService.startDriverRentalSession(
                                     Session(this),
                                     this,
@@ -102,6 +111,10 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
                                 )
                             }
                         }else{
+                            loading.visibility = VISIBLE
+                            window.setFlags(
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                             DriverService.startDriverRentalSession(
                                 Session(this),
                                 this,
@@ -123,7 +136,6 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
             startRentalButton.text = getString(R.string.loginToStartRenting)
         }
 
-
     }
 
     companion object {
@@ -134,20 +146,27 @@ class VehicleDetailsActivity : AppCompatActivity(),VolleyListener {
         if (result is Result.Success) {
             val resultData = result.data as String
             if(resultData.contains("SUCCESS")){
+
                 val intent = Intent(this, RentalSessionActivity::class.java)
                 startActivity(intent)
 
                 val resultIntent = Intent()
                 resultIntent.putExtra("status",this.getString(R.string.RENTAL_STARTED_OK))
+                loading.visibility = INVISIBLE
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 setResult(Activity.RESULT_OK,resultIntent)
                 this.finish()
             }
             else{
                 Toast.makeText(this,resultData, Toast.LENGTH_LONG).show()
+                loading.visibility = INVISIBLE
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
 
         } else {
             Toast.makeText(this,result.toString(), Toast.LENGTH_LONG).show()
+            loading.visibility = INVISIBLE
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         }
     }
 

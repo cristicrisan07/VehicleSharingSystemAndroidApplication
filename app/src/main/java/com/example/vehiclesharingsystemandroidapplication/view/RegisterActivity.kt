@@ -41,7 +41,7 @@ class RegisterActivity : AppCompatActivity() {
         val lastName = findViewById<EditText>(R.id.last_name)
         val phoneNumber = findViewById<EditText>(R.id.phone_number_text)
         val email = findViewById<EditText>(R.id.email_text)
-        val loading = findViewById<ProgressBar>(R.id.loading_subscriptions)
+        val loading = findViewById<ProgressBar>(R.id.loading_register)
         session = Session(this)
 
         val registerButton = findViewById<Button>(R.id.registerButton)

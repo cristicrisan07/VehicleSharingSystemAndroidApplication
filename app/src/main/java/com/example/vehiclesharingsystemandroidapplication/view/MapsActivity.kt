@@ -118,6 +118,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
         val username =session!!.getUsername()
 
         mMap.setOnMarkerClickListener { marker ->
+
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 11.0f))
             val intent = Intent(this, VehicleDetailsActivity::class.java)
             intent.putExtra("vehicle", vehicles.find { it.location == marker.position })
@@ -206,7 +207,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
                                         if(markers[veh.vin]!!.position != veh.location){
                                             markers[veh.vin]!!.remove()
                                             mMap.addMarker(MarkerOptions().position(veh.location))
-                                                ?.let { markers.putIfAbsent(veh.vin, it) }
+                                                ?.let {
+                                                    //markers.putIfAbsent(veh.vin, it)
+                                                    markers.put(veh.vin,it)
+                                                }
                                         }
                                     }
                                 }
