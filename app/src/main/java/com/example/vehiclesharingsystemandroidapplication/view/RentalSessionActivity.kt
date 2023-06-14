@@ -54,13 +54,17 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
     private lateinit var amountToPayTextView:TextView
     private lateinit var vehicle:Vehicle
     private lateinit var currentRentalSession:RentalSession
+    private lateinit var temporaryStateOfCurrentRentalSession: RentalSession
     private lateinit var session: Session
     private lateinit var loading:ProgressBar
+    private lateinit var functioningModeLabel:TextView
     private var state:String = "IDLE"
     private var discoveredDevice:BluetoothDevice? = null
     private var timeout:Boolean = false
     private lateinit var resultLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
     private var count: Boolean = true
+    private var getState: Boolean = true
+    private var currentVehicleControllerState: String = "NORMAL"
     private var socket: BluetoothSocket? = null
     private var btDevFilter:IntentFilter? = null
     private val generalUuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
@@ -77,6 +81,7 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
         lockCarButton.isEnabled = false
 
         loading = findViewById(R.id.loadingAtRentalSession)
+        functioningModeLabel = findViewById(R.id.emergencyFunctioningModeLabel)
         session = Session(this)
         currentRentalSession = RentalSession.fromJSONString(session.getCurrentRentalSession()!!)
         vehicle = currentRentalSession.vehicle
@@ -122,20 +127,20 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
         finishRentalSessionButton.setOnClickListener {
             count=false
             val now = LocalDateTime.now()
-            currentRentalSession.cost =
+            temporaryStateOfCurrentRentalSession = currentRentalSession
+            temporaryStateOfCurrentRentalSession.cost =
                 Duration.between(currentRentalSession.startTime,now).toMinutes().toDouble()* currentRentalSession.vehicle.price.value
-            currentRentalSession.endTime = now
-            session.setCurrentRentalSession(currentRentalSession.toJsonString())
+            temporaryStateOfCurrentRentalSession.endTime = now
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnCompleteListener {
-                currentRentalSession.vehicle.location =  LatLng(
+                temporaryStateOfCurrentRentalSession.vehicle.location =  LatLng(
                     it.result.latitude,
                     it.result.longitude
                 )
                 DriverService.endDriverRentalSession(
                     session,
                     this,
-                    currentRentalSession,
+                    temporaryStateOfCurrentRentalSession,
                     this as VolleyListener,
                 )
             }
@@ -220,6 +225,7 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
                 }
             }
         }catch (e:Exception){
+            getState = false
             e.printStackTrace()
             unlockCarButton.isEnabled = false
             lockCarButton.isEnabled = false
@@ -228,6 +234,84 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
                 connectToVehicle()
             }
 
+        }
+    }
+
+//    private fun listenToMessagesFromController(){
+//        try{
+//            val dis = DataInputStream(socket!!.inputStream)
+//            val cmd = StringBuilder()
+//            var c: Char
+//            while (dis.readChar().also { c = it }.code > 0 && c != '\n') {
+//                //println(c)
+//                cmd.append(c)
+//            }
+//            if(!cmd.toString().contains("LIMP_MODE")){
+//                if(cmd.toString() !="terminate"){
+//                    Toast.makeText(this, cmd.toString(), Toast.LENGTH_SHORT).show()
+//                }
+//            }else{
+//                functioningModeLabel.text = cmd.toString()
+//            }
+//
+//        }catch(e:Exception){
+//            e.printStackTrace()
+//            unlockCarButton.isEnabled = false
+//            lockCarButton.isEnabled = false
+//            Toast.makeText(this, "Connection with vehicle interrupted.\n Reestablishing connection...", Toast.LENGTH_SHORT).show()
+//            lifecycleScope.launch {
+//                connectToVehicle()
+//            }
+//        }
+//    }
+
+    private suspend fun getVehicleStateFromController(){
+        while(getState){
+            try{
+                val dos = DataOutputStream(socket!!.outputStream)
+                dos.writeChars("GET_STATE"+"\n")
+                val dis = DataInputStream(socket!!.inputStream)
+                val cmd = StringBuilder()
+                while(cmd.toString()!= "terminate"){
+                    cmd.delete(0, cmd.length)
+                    var c: Char
+                    while (dis.readChar().also { c = it }.code > 0 && c != '\n') {
+                        cmd.append(c)
+                    }
+                    val res = cmd.toString()
+                    if(res != "terminate") {
+                        val controllerStateJSONObject = JSONObject(res)
+                        val controllerState = controllerStateJSONObject.getString("state")
+                        if (controllerState != currentVehicleControllerState) {
+                            currentVehicleControllerState = controllerState
+                            if(controllerState!="NORMAL") {
+                                functioningModeLabel.text = currentVehicleControllerState +
+                                " has been enforced on:\n" +
+                                        controllerStateJSONObject.getString("issueTime") +
+                                        "\nfor the following reason:\n" +
+                                        controllerStateJSONObject.getString("reason")
+                                Toast.makeText(this, "Please pull over." +
+                                        " Your vehicle will enter limp mode soon.",
+                                    Toast.LENGTH_LONG).show()
+                            }else{
+                                functioningModeLabel.text = "Regular mode reactivated"
+                                Toast.makeText(this, "Regular mode reactivated.", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                }
+            }catch (e:Exception){
+                getState = false
+                e.printStackTrace()
+                unlockCarButton.isEnabled = false
+                lockCarButton.isEnabled = false
+                Toast.makeText(this, "Connection with vehicle interrupted.\n Reestablishing connection...", Toast.LENGTH_SHORT).show()
+                lifecycleScope.launch {
+                    connectToVehicle()
+                }
+
+            }
+            delay(60000L)
         }
     }
 
@@ -245,12 +329,44 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
                     println(c)
                     cmd.append(c)
                 }
-                if(cmd.toString() == "CONNECTED"){
+                val remoteJSONObject = JSONObject(cmd.toString())
+                if(remoteJSONObject.getString("connectionStatus") == "CONNECTED"){
                     Toast.makeText(
                         this, "Vehicle successfully identified", Toast.LENGTH_LONG)
                         .show()
                     unlockCarButton.isEnabled = true
                     lockCarButton.isEnabled = true
+                    getState = true
+                    val controllerStateJSONObject = JSONObject(remoteJSONObject.getString("controllerState"))
+                    val controllerState = controllerStateJSONObject.getString("state")
+                    if (controllerState != currentVehicleControllerState) {
+                        currentVehicleControllerState = controllerState
+                        if (controllerState != "NORMAL") {
+                            currentVehicleControllerState = controllerState
+                            functioningModeLabel.text = currentVehicleControllerState +
+                                    " has been enforced on:\n" +
+                                    controllerStateJSONObject.getString("issueTime") +
+                                    "\nfor the following reason:\n" +
+                                    controllerStateJSONObject.getString("reason")
+                            Toast.makeText(
+                                this, "Please pull over." +
+                                        " Your vehicle will enter limp mode soon.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            functioningModeLabel.text = "Regular mode reactivated"
+                            Toast.makeText(this, "Regular mode reactivated.", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+//                    lifecycleScope.launch {
+//                        listenToMessagesFromController()
+//                    }
+
+                    lifecycleScope.launch {
+                        getVehicleStateFromController()
+                    }
+
                 }else{
                     Toast.makeText(
                         this, "Vehicle controller identified, but could not connect to it.\n"
@@ -264,6 +380,7 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
                 }
             }
         }catch (e:Exception){
+            getState = false
             e.printStackTrace()
             Toast.makeText(
                 this, "Vehicle controller identified, but could not connect to it.\n"
@@ -369,6 +486,8 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
             if (resultJSONObject.getString("source") == "rentalSessionEndCall"){
                 val response = resultJSONObject.getString("response")
                 if (response.contains("SUCCESS")) {
+                    currentRentalSession = temporaryStateOfCurrentRentalSession
+                    session.setCurrentRentalSession(currentRentalSession.toJsonString())
                     socket?.close()
                     if (session.getActiveSubscription() == null) {
                         val intent = Intent(this, PaymentActivity::class.java)
@@ -383,7 +502,8 @@ class RentalSessionActivity : AppCompatActivity(),VolleyListener {
                             this as VolleyListener)
                     }
                 } else {
-                    Toast.makeText(this, resultData, Toast.LENGTH_LONG).show()
+                    println(resultData)
+                    Toast.makeText(this, response, Toast.LENGTH_SHORT).show()
                 }
             }else{
                 if (resultJSONObject.getString("response") == "SUCCESS") {
