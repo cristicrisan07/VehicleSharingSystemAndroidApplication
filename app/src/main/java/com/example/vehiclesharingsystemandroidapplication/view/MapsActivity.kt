@@ -100,7 +100,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ActivityCompat.OnRe
         }
 
         setUpMap()
-        mMap.uiSettings.isZoomControlsEnabled = true
+        //mMap.uiSettings.isZoomControlsEnabled = true
 
         // In this case, the user has already given the permissions, thus there is a need to check them.
         runBlocking {
