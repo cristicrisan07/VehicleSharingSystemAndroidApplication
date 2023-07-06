@@ -44,76 +44,82 @@ class VerifyIdentityActivity : AppCompatActivity(),VolleyListener {
     private lateinit var imageUri:Uri
 
     private var resultLauncherBack: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        var bitmap: Bitmap? = null
-        val contentResolver = contentResolver
-        try {
-            bitmap = if (Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-            } else {
-                val source: ImageDecoder.Source =
-                    ImageDecoder.createSource(contentResolver, imageUri)
-                ImageDecoder.decodeBitmap(source)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        encodedPhotoBack = bitmap?.let {
-                it -> encodeImage(it)
-        }
-            takeBackPhotoButton.isEnabled = false
-            takeBackPhotoButton.text = this.getString(R.string.take_photo_back_button_taken)
-            if(encodedPhotoFront !=null && encodedPhotoID !=null){
-                submitButton.isEnabled = true
-            }
-    }
-
-    private var resultLauncherID: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        var bitmap: Bitmap? = null
-        val contentResolver = contentResolver
-        try {
-            bitmap = if (Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-            } else {
-                val source: ImageDecoder.Source =
-                    ImageDecoder.createSource(contentResolver, imageUri)
-                ImageDecoder.decodeBitmap(source)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        encodedPhotoID = bitmap?.let {
-                it -> encodeImage(it)
-        }
-        takeIDPhotoButton.isEnabled = false
-        takeIDPhotoButton.text = this.getString(R.string.take_photo_front_button_taken)
-        if(encodedPhotoFront !=null && encodedPhotoBack !=null){
-            submitButton.isEnabled = true
-        }
-    }
-
-    private var resultLauncherFront: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            var bitmap: Bitmap? = null
+        if(result.resultCode== RESULT_OK){
             val contentResolver = contentResolver
             try {
-                bitmap = if (Build.VERSION.SDK_INT < 28) {
+               val bitmap = if (Build.VERSION.SDK_INT < 28) {
                     MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
                 } else {
                     val source: ImageDecoder.Source =
                         ImageDecoder.createSource(contentResolver, imageUri)
                     ImageDecoder.decodeBitmap(source)
                 }
+                encodedPhotoBack = bitmap?.let {
+                        it -> encodeImage(it)
+                }
+                if(bitmap!=null){
+                    takeBackPhotoButton.isEnabled = false
+                    takeBackPhotoButton.text = this.getString(R.string.take_photo_back_button_taken)
+                    if(encodedPhotoFront !=null && encodedPhotoID !=null){
+                        submitButton.isEnabled = true
+                    }
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            encodedPhotoFront = bitmap?.let {
-                    it -> encodeImage(it)
-            }
-            takeFrontPhotoButton.isEnabled = false
-            takeFrontPhotoButton.text = this.getString(R.string.take_photo_front_button_taken)
-        if(encodedPhotoBack!=null && encodedPhotoID !=null){
-            submitButton.isEnabled = true
         }
+    }
 
+    private var resultLauncherID: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if(result.resultCode==RESULT_OK){
+            val contentResolver = contentResolver
+            try {
+                val bitmap = if (Build.VERSION.SDK_INT < 28) {
+                    MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+                } else {
+                    val source: ImageDecoder.Source =
+                        ImageDecoder.createSource(contentResolver, imageUri)
+                    ImageDecoder.decodeBitmap(source)
+                }
+                encodedPhotoID = bitmap?.let {
+                        it -> encodeImage(it)
+                }
+                if(bitmap!=null){
+                    takeIDPhotoButton.isEnabled = false
+                    takeIDPhotoButton.text = this.getString(R.string.take_photo_front_button_taken)
+                    if(encodedPhotoFront !=null && encodedPhotoBack !=null){
+                        submitButton.isEnabled = true
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private var resultLauncherFront: ActivityResultLauncher<Intent>? = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+         if(result.resultCode== RESULT_OK){
+            val contentResolver = contentResolver
+            try {
+                val bitmap = if (Build.VERSION.SDK_INT < 28) {
+                    MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+                } else {
+                    val source: ImageDecoder.Source =
+                        ImageDecoder.createSource(contentResolver, imageUri)
+                    ImageDecoder.decodeBitmap(source)
+                }
+                encodedPhotoFront = bitmap?.let {
+                        it -> encodeImage(it)
+                }
+                takeFrontPhotoButton.isEnabled = false
+                takeFrontPhotoButton.text = this.getString(R.string.take_photo_front_button_taken)
+                if(encodedPhotoBack!=null && encodedPhotoID !=null){
+                    submitButton.isEnabled = true
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+         }
     }
 
 

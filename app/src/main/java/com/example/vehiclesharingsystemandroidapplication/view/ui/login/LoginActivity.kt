@@ -194,6 +194,7 @@ class LoginActivity : AppCompatActivity(),VolleyListener {
     }
     override fun onResume() {
         loading.visibility = View.INVISIBLE
+        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         super.onResume()
     }
 }
